@@ -26,6 +26,7 @@ let app = new Vue({
         ],
         sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         cart: 0,
+        onSale: true,
 
     },
 
@@ -56,9 +57,14 @@ let app = new Vue({
         inStock(){
             return this.variants[this.selectedVariant].variantQuantity
         },
+        sale() {
+            if (this.onSale) {
+                return this.brand + ' ' + this.product + ' are on sale!'
+            }
+            return  this.brand + ' ' + this.product + ' are not on sale'
+        }
     },
 
 })
 
-// сделать ПР7, я остановился на том что
-// пофиксил работу картинок с новым значением variants в data
+
