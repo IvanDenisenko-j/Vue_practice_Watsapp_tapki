@@ -1,9 +1,24 @@
+Vue.component('product-detail', {
+    props: {
+        details: {
+            type: Array,
+            required: true
+        }
+    },
+    template: `
+    <ul>
+        <li v-for="detail in details">{{ detail }}</li>
+    </ul>
+    `,
+
+})
+
 Vue.component('product', {
     props: {
       premium: {
           type: Boolean,
           required: true,
-      },
+      }
     },
     template: `
     <div class="product">
@@ -14,10 +29,12 @@ Vue.component('product', {
         <div class="product-info">
             <h1>{{ title }}</h1>
             <p>{{ description }}</p>
+            <product-detail :details="details"> </product-detail>
+            
             <a :href="link">More products like this</a>
             <p v-if="inStock">In stock</p>
             <p v-else :class="{ strikethrough: !inStock }">Out of stock</p>
-            <p>{{ sale }}</p>
+            <span v-if="onSale">On sale</span>
             <ul>
                 <li v-for="detail in details">{{ detail }}</li>
             </ul>
@@ -36,17 +53,16 @@ Vue.component('product', {
             </ul>
             
             <div class="cart">
-                <p>Cart({{ cart }})</p>
-            </div>
-            
             <button
-                    v-on:click="addToCart"
-                    :disabled="!inStock"
-                    :class="{ disabledButton: !inStock }"
-            >
-                Add to cart
-            </button>
-            <button v-on:click="deliteToCart">Delite to cart</button>
+                        v-on:click="addToCart"
+                        :class="{ disabledButton: !inStock }"
+                >
+                    Add to cart
+                </button>
+                <button v-on:click="deliteToCart">Delite to cart</button>
+            </div>
+            <span>{{ sale }}</span>
+            <p>Shipping: {{ shipping }}</p>
         </div>
     </div>
     `,
@@ -58,7 +74,6 @@ Vue.component('product', {
             selectedVariant: 0,
             altText: "A pair of socks",
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
-            inStock: true,
             onSale: true,
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
@@ -81,16 +96,13 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
         deliteToCart() {
-            if (this.cart > 0) {
-                this.cart -= 1
-            }
+            this.$emit('del-to-cart', this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index;
-            console.log(index);
         },
     },
     computed: {
@@ -104,18 +116,8 @@ Vue.component('product', {
             return this.variants[this.selectedVariant].variantQuantity
         },
         sale() {
-            if (this.onSale) {
-                return this.brand + ' ' + this.product + ' are on sale!'
-            }
-            return  this.brand + ' ' + this.product + ' are not on sale'
+            return this.onSale ? `${this.brand} ${this.product} is on sale!` : `${this.brand} ${this.product} is not on sale.`;
         },
-    },
-})
-
-let app = new Vue({
-    el: '#app',
-    data: {
-        premium: true,
         shipping() {
             if (this.premium) {
                 return "Free";
@@ -124,6 +126,23 @@ let app = new Vue({
             }
         },
     },
+})
+
+let app = new Vue({
+    el: '#app',
+    data: {
+        premium: true,
+        cart: []
+
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        delCart(id) {
+            this.cart.pop(id);
+        }
+    }
 })
 
 
