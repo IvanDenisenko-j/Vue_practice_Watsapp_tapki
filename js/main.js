@@ -180,20 +180,23 @@ Vue.component('product', {
                     <p v-else style="text-decoration: line-through">Out of Stock</p>
                     <span v-if="onSale"> On Sale </span> <br><br>
                     <p>{{ sale }}</p>
-                    <p>Materials: {{ material }}</p> 
-                    <p>Price: {{ price }}</p>
-                    <div
-                        class="color-box"
-                        v-for="(variant, index) in variants"
+                    <div class="color-box"
+                        v-for="(variant, index) in variants" 
                         :key="variant.variantId"
                         :style="{ backgroundColor: variant.variantColor }"
                         @mouseover="updateProduct(index)"
-                    ></div>
+                        >
+                    </div>
                     <h2>Available Sizes:</h2>
                     <ul>
                         <li v-for="size in sizes" :key="size">{{ size }}</li>
                     </ul>
-                    <button @click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
+                    <button v-on:click="addToCart" 
+          :disabled="!inStock"
+          :class="{ disabledButton: !inStock }"
+          >
+        Add to cart
+        </button>
                     <button @click="removeFromCart">Remove from cart</button>
                 </div>
                      <div>
@@ -219,25 +222,13 @@ Vue.component('product', {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10 ,
-                    basePrice: 25,
-                    materials: [
-                        { name: 'Cotton', coefficient: 0.5 },
-                        { name: 'Polyester', coefficient: 0.5 }
-                    ]
+                    variantQuantity: 10
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-
-                    variantQuantity: 10,
-                    basePrice: 19,
-                    materials: [
-                        { name: 'wool', coefficient: 0.4 },
-                        { name: 'neilon', coefficient: 0.2 },
-                        { name: 'barashek', coefficient: 0.4 }
-                    ]
+                    variantQuantity: 0
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
@@ -273,21 +264,13 @@ Vue.component('product', {
             return this.variants[this.selectedVariant].variantImage;
         },
         inStock() {
-            return this.variants[this.selectedVariant].variantQuantity > 0;
+            return this.variants[this.selectedVariant].variantQuantity;
         },
         sale() {
             return this.onSale ? `${this.brand} ${this.product} is on sale!` : `${this.brand} ${this.product} is not on sale.`;
         },
         shipping() {
             return this.premium ? "Free" : "2.99";
-        },
-        material() {
-            return this.variants[this.selectedVariant].materials.map(material => material.name).join(' , ');
-        },
-        price() {
-            const basePrice = this.variants[this.selectedVariant].basePrice;
-            const totalCoefficient = this.variants[this.selectedVariant].materials.reduce((total, material) => total + material.coefficient, 1);
-            return (basePrice * totalCoefficient).toFixed(2);
         },
     }
 });
